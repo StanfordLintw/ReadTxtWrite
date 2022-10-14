@@ -8,17 +8,19 @@ import java.util.List;
 public class test {
 
     // 建立文字檔路徑
-    private static String path = "D:/";
+//    private static String path = "D:/";
+    private static String path = "/Users/user/Desktop/";
     private static String filenameTemp;
 
     public static void main(String[] args) throws IOException, ParseException {
-
 
         List<String> calculate = new ArrayList<>();
         double ThirtyThreeOverTimeHr = 0.0;
         double SixtySevenOverTimeHr = 0.0;
         double TwoOverTimeHr = 0.0;
 
+        // 這邊之後要修改成，去特定目錄資料夾下，讀取所有的txt文字檔，
+        // 並將最後結果寫到新建立的文字檔內呈現
 
         String filePath = "/Users/user/Desktop/MON20220901_00016謝宜潔.txt";
         FileInputStream fin = new FileInputStream(filePath);
@@ -36,6 +38,11 @@ public class test {
 //            System.out.println(calculate.get(i));
             //字串轉時間格式做加減，判斷有無8小時，加班時數多少
             System.out.println(data[0]);
+
+            //先建立txt檔案:
+//            creatTxtFile(data[0]);
+
+
             String OnboardTime = data[7].trim();
             String OffboardTime = data[8].trim();
 
@@ -45,14 +52,56 @@ public class test {
                 long min = CalculateOverTime(OnboardTime,OffboardTime);
                 System.out.println(min);
 
+                if(min >=25 && min <= 30) {
+                    ThirtyThreeOverTimeHr += 0.5;
+
+                }else if(min > 30 && min < 60){
+                    ThirtyThreeOverTimeHr+=(double) (min/60);
+
+                }else if(min >= 60 && min < 120){
+                    ThirtyThreeOverTimeHr+=(double) (min/60);
+
+                }else if(min >= 120 && min < 180){
+                    if(min == 120)
+                        ThirtyThreeOverTimeHr+=2;
+                    else {
+                        min = min - 120;
+                        ThirtyThreeOverTimeHr+=2;
+                        SixtySevenOverTimeHr+=(double) (min/60);
+                    }
+                }else if(min >= 180 && min < 240){
+                    if(min == 180){
+                        ThirtyThreeOverTimeHr+=2;
+                        SixtySevenOverTimeHr+=1;
+                    } else {
+                        min = min - 180;
+                        ThirtyThreeOverTimeHr+=2;
+                        SixtySevenOverTimeHr+=1;
+                        SixtySevenOverTimeHr+=(double) (min/60);
+                    }
+                }else if(min >= 240 ){
+                    if(min == 240){
+                        ThirtyThreeOverTimeHr+=2;
+                        SixtySevenOverTimeHr+=2;
+                    } else {
+                        min = min - 240;
+                        ThirtyThreeOverTimeHr+=2;
+                        SixtySevenOverTimeHr+=2;
+                        TwoOverTimeHr+=(double) (min/60);
+                    }
+                }
             }
-
-
-
-
-
         }
 
+        System.out.println("平日加班1.33時數為:"+ThirtyThreeOverTimeHr+" H");
+        System.out.println("平日加班1.67時數為:"+SixtySevenOverTimeHr+" H");
+        System.out.println("平日加班2.00時數為:"+TwoOverTimeHr+" H");
+
+        String dataStr = "平日加班1.33時數為:"+ThirtyThreeOverTimeHr+" H\n"
+                        +"平日加班1.67時數為:"+SixtySevenOverTimeHr+" H\n"
+                        +"平日加班2.00時數為:"+TwoOverTimeHr+" H";
+
+//        writeTxtFile(dataStr);
 
     }
 
@@ -75,23 +124,18 @@ public class test {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
-        //取的兩個時間
+        //取得兩個時間
 
         Date dt1 =sdf.parse(stantdardOffboardTime);
 
         Date dt2 =sdf.parse(endTime);
 
-        System.out.println(dt1);
-        System.out.println(dt2);
 
         //取得兩個時間的Unix時間
 
         Long ut1=dt1.getTime();
 
         Long ut2=dt2.getTime();
-
-        System.out.println(ut1);
-        System.out.println(ut2);
 
         //相減獲得兩個時間差距的毫秒
 
